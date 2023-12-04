@@ -11,7 +11,7 @@ Copyright the Authors (License MIT)
 
 Script for the reaching task.
 
-> python run_adaptation.py
+> python run_reaching.py
 """
 
 # Parameters
@@ -44,13 +44,17 @@ from CPG_lib.MLMPCPG.SetTiming import *
 
 
 # Prepare save directory
-folder_net = './results/network_g' + str(num_goals) + '_run'
+folder_net = 'results/network_g' + str(num_goals) + '_run'
 if len(sys.argv) > 1:
     folder_net += '_' + sys.argv[1]
 Path(folder_net).mkdir(parents=True, exist_ok=True)
 
 # Compile the network
-compile(directory="./annarchy/run_" + sys.argv[1])
+compile_folder = "annarchy/"
+if not os.path.exists(compile_folder):
+    os.mkdir(compile_folder)
+
+compile(directory=compile_folder + f"run_{sys.argv[1]}")
 
 # Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
@@ -238,10 +242,10 @@ np.save(folder_net + '/error_' + str(num_goals) + '.npy', error_history)
 np.save(folder_net + '/parameter_' + str(num_goals) + '.npy' ,parameter)
 np.save(folder_net + '/goals.npy', goal_history)
 np.save(folder_net + '/goal_per_trial.npy', goal_per_trial)
-# np.save(folder_net + '/fin_pos_trials.npy', fin_pos_trials)
-# np.save(folder_net + '/init_pos_trials.npy', init_pos_trials)
-# np.save(folder_net + '/init_angles_trials.npy', init_angles)
+np.save(folder_net + '/fin_pos_trials.npy', fin_pos_trials)
+np.save(folder_net + '/init_pos_trials.npy', init_pos_trials)
+np.save(folder_net + '/init_angles_trials.npy', init_angles)
 
 # # Save network connectivity
-# for proj in projections():
-#     proj.save_connectivity(filename=folder_net + '/weights_' + proj.name + '.npz')
+for proj in projections():
+    proj.save_connectivity(filename=folder_net + '/weights_' + proj.name + '.npz')
