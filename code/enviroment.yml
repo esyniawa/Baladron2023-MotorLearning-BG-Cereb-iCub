@@ -241,7 +241,6 @@ dependencies:
   - zstandard=0.22.0=py310h1275a96_0
   - zstd=1.5.5=hfc55251_0
   - pip:
-      - annarchy==4.7.2.6
       - cma==3.3.0
       - contourpy==1.2.0
       - cycler==0.12.1
