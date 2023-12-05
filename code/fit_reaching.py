@@ -269,7 +269,7 @@ def fit_reservoir(initial_eta=0.8,
             error_history[t] = error
 
         fitting_error = (weight_mean * np.mean(error_history[-accumulate_trials:]) +
-                         weight_sd * np.sd(error_history[-accumulate_trials:]))
+                         weight_sd * np.std(error_history[-accumulate_trials:]))
 
         return fitting_error
 
@@ -284,10 +284,8 @@ def fit_reservoir(initial_eta=0.8,
 
     return fitted_params
 
-
-with suppress_stdout():
-    res = fit_reservoir()
-
+# run optimization
+res = fit_reservoir()
 np.save(folder_net + '/fitted_params' + str(num_goals) + '.npy', res)
 
 
