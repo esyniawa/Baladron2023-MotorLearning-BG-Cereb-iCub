@@ -22,7 +22,7 @@ from pathlib import Path
 
 # ANNarchy
 from ANNarchy import *
-setup(num_threads=2)
+setup(num_threads=4)
 
 # Model
 from reservoir import *
@@ -54,7 +54,7 @@ def suppress_stdout():
 # Parameters
 num_goals = int(sys.argv[2]) # Number of goals. 2 or 8 in the manuscript
 num_goals_per_trial = 300 # Number of trials per goal
-num_trials_test = 100 # Number of test trials with the reservoir
+num_trials_test = 50 # Number of test trials with the reservoir
 
 # Prepare save directory
 folder_net = 'results/network_g' + str(num_goals) + '_run'
@@ -188,7 +188,7 @@ def fit_reservoir(initial_eta=0.8,
     def loss_function(res_params,
                       weight_mean=1.0,
                       weight_sd=1.0,
-                      accumulate_trials=100):
+                      accumulate_trials=20):
 
         param_eta, param_A, param_f = res_params
 
@@ -206,8 +206,8 @@ def fit_reservoir(initial_eta=0.8,
         for t in range(num_trials):
 
             # Select the goal
-            current_goal =  goal_history[t%num_goals]
-            current_params =  np.copy(parameters_per_goal(current_goal))
+            current_goal = goal_history[t%num_goals]
+            current_params = np.copy(parameters_per_goal(current_goal))
             goal_per_trial.append(current_goal)
 
             # Reinitialize the reservoir
