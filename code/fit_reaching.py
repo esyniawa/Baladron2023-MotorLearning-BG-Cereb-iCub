@@ -53,7 +53,7 @@ def suppress_stdout():
 
 # Parameters
 num_goals = int(sys.argv[2]) # Number of goals. 2 or 8 in the manuscript
-num_goals_per_trial = 300 # Number of trials per goal
+num_goals_per_trial = 100 # Number of trials per goal
 num_trials_test = 50 # Number of test trials with the reservoir
 
 # Prepare save directory
