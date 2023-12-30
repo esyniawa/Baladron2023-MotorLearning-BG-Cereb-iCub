@@ -3,14 +3,14 @@ startTime=$(date +%s)
 let parallel=$1
 let durchgaenge=$2
 
-let goals=2
+let goals=$3
 
 # start paradigma
 for durchgang in $(seq $durchgaenge); do
 	startdurchgangTime=$(date +%s)
         for i in $(seq $parallel); do
                 let y=$i+$parallel*$((durchgang - 1))
-                python fit_reaching.py $y $goals &
+                python run_reaching.py $y $goals &
         done
         wait
         sleep 5

@@ -22,7 +22,7 @@ from pathlib import Path
 
 # ANNarchy
 from ANNarchy import *
-setup(num_threads=4)
+setup(num_threads=8)
 
 # Model
 from reservoir import *
@@ -149,7 +149,7 @@ def gaussian_input(x,mu,sig):
     return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
 
 distance_history = np.zeros(num_trials_test)
-goal_history= np.zeros((num_trials_test,3))
+goal_history = np.zeros((num_trials_test,3))
 parameter_history = np.zeros((num_trials_test,4,6))
 final_pos_history = np.zeros((num_trials_test,3))
 
@@ -162,6 +162,7 @@ num_trials = num_goals * num_goals_per_trial
 error_history = np.zeros(num_trials)
 dh = np.zeros(num_trials)
 
+num_accumulate = num_trials - num_trials_test
 ###################
 # BG controller
 ###################
@@ -187,8 +188,8 @@ def fit_reservoir(initial_eta=0.8,
     my_params = (initial_eta, initial_A, initial_f)
     def loss_function(res_params,
                       weight_mean=1.0,
-                      weight_sd=1.0,
-                      accumulate_trials=20):
+                      weight_sd=2.0,
+                      accumulate_trials=num_accumulate):
 
         param_eta, param_A, param_f = res_params
 
@@ -277,7 +278,7 @@ def fit_reservoir(initial_eta=0.8,
 
     bads = BADS(target, np.array(my_params),
                 plausible_lower_bounds=np.array((0, 0, 0)),
-                plausible_upper_bounds=np.array((10, 200, 100)))
+                plausible_upper_bounds=np.array((5, 100, 100)))
 
     optimize_result = bads.optimize()
     fitted_params = optimize_result['x']
@@ -286,7 +287,7 @@ def fit_reservoir(initial_eta=0.8,
 
 # run optimization
 res = fit_reservoir()
-np.save(folder_net + '/fitted_params' + str(num_goals) + '.npy', res)
+np.save(folder_net + f'/fitted_params_run{sys.argv[1]}_goals{sys.argv[2]}.npy', res)
 
 
 # ## Save network data
