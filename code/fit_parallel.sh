@@ -10,7 +10,7 @@ for durchgang in $(seq $durchgaenge); do
 	startdurchgangTime=$(date +%s)
         for i in $(seq $parallel); do
                 let y=$i+$parallel*$((durchgang - 1))
-                python run_reaching.py $y $goals &
+                python fit_reaching.py $y $goals &
         done
         wait
         sleep 5

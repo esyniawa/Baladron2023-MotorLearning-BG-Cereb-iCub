@@ -57,7 +57,7 @@ num_goals_per_trial = 100 # Number of trials per goal
 num_trials_test = 50 # Number of test trials with the reservoir
 
 # Prepare save directory
-folder_net = 'results/network_g' + str(num_goals) + '_run'
+folder_net = 'results/f_network_g' + str(num_goals) + '_run' + sys.argv[1]
 if len(sys.argv) > 1:
     folder_net += '_' + sys.argv[1]
 Path(folder_net).mkdir(parents=True, exist_ok=True)
