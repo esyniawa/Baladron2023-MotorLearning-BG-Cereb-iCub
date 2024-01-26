@@ -15,10 +15,12 @@ Script for the reaching task.
 """
 # Basic imports
 import importlib
+import os.path
 import sys
 import time
 import numpy as np
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 # ANNarchy
 from ANNarchy import *
@@ -50,14 +52,21 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+def moving_average(a, n):
+    ret = np.cumsum(a, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n - 1 :] / n
+
 
 # Parameters
 num_goals = int(sys.argv[2]) # Number of goals. 2 or 8 in the manuscript
 num_goals_per_trial = 100 # Number of trials per goal
 num_trials_test = 50 # Number of test trials with the reservoir
 
+do_plot=False
+
 # Prepare save directory
-folder_net = 'results/f_network_g' + str(num_goals) + '_run' + sys.argv[1]
+folder_net = 'results/f_network_g' + str(num_goals) + '_run'
 if len(sys.argv) > 1:
     folder_net += '_' + sys.argv[1]
 Path(folder_net).mkdir(parents=True, exist_ok=True)
@@ -162,7 +171,7 @@ num_trials = num_goals * num_goals_per_trial
 error_history = np.zeros(num_trials)
 dh = np.zeros(num_trials)
 
-num_accumulate = num_trials - num_trials_test
+num_accumulate = num_trials - 20
 ###################
 # BG controller
 ###################
@@ -177,6 +186,9 @@ alpha = 0.33 #0.75 0.33
 ###################
 # Reservoir
 ###################
+if do_plot:
+    global count
+    count = 0
 
 # loss function (last trials -> mean and sd?)
 print('fitting reservoir...')
@@ -269,8 +281,10 @@ def fit_reservoir(initial_eta=0.8,
             R_mean[t%num_goals] = alpha * R_mean[t%num_goals] + (1.- alpha) * error
             error_history[t] = error
 
-        fitting_error = (weight_mean * np.mean(error_history[-accumulate_trials:]) +
-                         weight_sd * np.std(error_history[-accumulate_trials:]))
+        my_mean = np.mean(error_history[-accumulate_trials:])
+        my_sd = np.std(error_history[-accumulate_trials:])
+
+        fitting_error = weight_mean * np.log(my_mean) + weight_sd * np.log(my_sd)
 
         return fitting_error
 
@@ -278,16 +292,32 @@ def fit_reservoir(initial_eta=0.8,
 
     bads = BADS(target, np.array(my_params),
                 plausible_lower_bounds=np.array((0, 0, 0)),
-                plausible_upper_bounds=np.array((5, 100, 100)))
+                plausible_upper_bounds=np.array((5, 50, 20)))
 
     optimize_result = bads.optimize()
     fitted_params = optimize_result['x']
 
-    return fitted_params
+    return fitted_params, error_history
 
 # run optimization
-res = fit_reservoir()
+res, error = fit_reservoir()
 np.save(folder_net + f'/fitted_params_run{sys.argv[1]}_goals{sys.argv[2]}.npy', res)
+
+if do_plot:
+    plot_folder = folder_net + "plots/"
+    if not os.path.exists(plot_folder):
+        os.mkdir(plot_folder)
+
+    c = 5
+    mov_error = moving_average(error, c)
+    x = np.arange(c, len(error))
+    fig, ax = plt.subplots()
+    ax.plot(error, color='k')
+    ax.plot(x, mov_error, color='r')
+    ax.set_xlabel('Number of trials')
+    ax.set_ylabel('Error')
+    plt.savefig(plot_folder + f'plot_run{sys.argv[1]}_goals{sys.argv[2]}.pdf')
+    plt.close(fig)
 
 
 # ## Save network data
