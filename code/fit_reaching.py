@@ -63,7 +63,7 @@ num_goals = int(sys.argv[2]) # Number of goals. 2 or 8 in the manuscript
 num_goals_per_trial = 100 # Number of trials per goal
 num_trials_test = 50 # Number of test trials with the reservoir
 
-do_plot=False
+do_plot = True
 
 # Prepare save directory
 folder_net = 'results/f_network_g' + str(num_goals) + '_run'
@@ -170,8 +170,6 @@ pop.enable()
 num_trials = num_goals * num_goals_per_trial
 error_history = np.zeros(num_trials)
 dh = np.zeros(num_trials)
-
-num_accumulate = num_trials - 20
 ###################
 # BG controller
 ###################
@@ -186,18 +184,17 @@ alpha = 0.33 #0.75 0.33
 ###################
 # Reservoir
 ###################
-if do_plot:
-    global count
-    count = 0
-
 # loss function (last trials -> mean and sd?)
 print('fitting reservoir...')
+num_accumulate = num_goals * 20  # last 20 trials per goal
+
 
 def fit_reservoir(initial_eta=0.8,
                   initial_A=20,
                   initial_f=9):
 
     my_params = (initial_eta, initial_A, initial_f)
+
     def loss_function(res_params,
                       weight_mean=1.0,
                       weight_sd=2.0,
