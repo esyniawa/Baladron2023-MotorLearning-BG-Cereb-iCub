@@ -206,9 +206,9 @@ def fit_reservoir(initial_eta=0.8,
         param_eta, param_A, param_f = res_params
 
         # set parameters in reservoir
-        TraceMiconi.eta = param_eta
-        RC_neuron.A = param_A
-        RC_neuron.f = param_f
+        Wi.eta = param_eta
+        pop.A = param_A
+        pop.f = param_f
 
         # learn with reservoir
         parameter = []
@@ -300,7 +300,10 @@ def fit_reservoir(initial_eta=0.8,
     return fitted_params, error_history
 
 # run optimization
-res, error = fit_reservoir()
+print('fit reservoir')
+with suppress_stdout():
+    res, error = fit_reservoir()
+
 np.save(folder_net + f'/fitted_params_run{sys.argv[1]}_goals{sys.argv[2]}.npy', res)
 
 if do_plot:
