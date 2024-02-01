@@ -30,6 +30,7 @@ from pathlib import Path
 # ANNarchy
 from ANNarchy import *
 setup(num_threads=2)
+import monitoring
 
 # Model
 from reservoir import *
@@ -44,17 +45,20 @@ from CPG_lib.MLMPCPG.SetTiming import *
 
 
 # Prepare save directory
-folder_net = 'results/network_g' + str(num_goals) + '_run'
-if len(sys.argv) > 1:
-    folder_net += '_' + sys.argv[1]
-Path(folder_net).mkdir(parents=True, exist_ok=True)
+folder_net = 'network_g' + str(num_goals) + '_run_' + sys.argv[1]
+output_folder = "results/"
+Path(output_folder + folder_net).mkdir(parents=True, exist_ok=True)
 
 # Compile the network
 compile_folder = "annarchy/"
 if not os.path.exists(compile_folder):
     os.mkdir(compile_folder)
 
-compile(directory=compile_folder + f"run_{sys.argv[1]}")
+compile(directory=compile_folder + folder_net)
+
+# Save initial Res weights
+ConMonitor = monitoring.Con_Monitor([Wi])
+ConMonitor.save_cons(output_folder + folder_net + "initial_w")
 
 # Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
@@ -197,7 +201,6 @@ for t in range(num_trials):
     output = rec['r'][-200:,-24:]
     output = np.mean(output,axis=0) * 2
 
-
     if(t > -1):
         current_params += output.reshape((4,6))
 
@@ -236,16 +239,14 @@ for t in range(num_trials):
 
 
 ## Save network data
-np.save(folder_net + '/error_' + str(num_goals) + '.npy', error_history)
+np.save(output_folder + folder_net + '/error_' + str(num_goals) + '.npy', error_history)
 
 # Save data
-np.save(folder_net + '/parameter_' + str(num_goals) + '.npy' ,parameter)
-np.save(folder_net + '/goals.npy', goal_history)
-np.save(folder_net + '/goal_per_trial.npy', goal_per_trial)
-np.save(folder_net + '/fin_pos_trials.npy', fin_pos_trials)
-np.save(folder_net + '/init_pos_trials.npy', init_pos_trials)
-np.save(folder_net + '/init_angles_trials.npy', init_angles)
+np.save(output_folder + folder_net + '/parameter_' + str(num_goals) + '.npy' ,parameter)
+np.save(output_folder + folder_net + '/goals.npy', goal_history)
+np.save(output_folder + folder_net + '/goal_per_trial.npy', goal_per_trial)
+np.save(output_folder + folder_net + '/fin_pos_trials.npy', fin_pos_trials)
+np.save(output_folder + folder_net + '/init_pos_trials.npy', init_pos_trials)
+np.save(output_folder + folder_net + '/init_angles_trials.npy', init_angles)
 
-# # Save network connectivity
-for proj in projections():
-    proj.save_connectivity(filename=folder_net + '/weights_' + proj.name + '.npz')
+ConMonitor.save_cons(output_folder + folder_net + 'learned_w')
