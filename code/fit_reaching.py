@@ -203,7 +203,7 @@ def fit_reservoir(initial_eta=0.8,
         param_eta, param_A, param_f = res_params
 
         # set parameters in reservoir
-        Wi.eta = param_eta
+        Wrec.eta = param_eta
         pop.A = param_A
         pop.f = param_f
 
