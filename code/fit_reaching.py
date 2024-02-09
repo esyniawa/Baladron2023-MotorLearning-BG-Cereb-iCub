@@ -288,7 +288,9 @@ def fit_reservoir(initial_eta=0.8,
     target = loss_function
 
     bads = BADS(target, np.array(my_params),
+                lower_bounds=np.array((0, 0, 0)),
                 plausible_lower_bounds=np.array((0, 0, 0)),
+                upper_bounds=np.array((5, 50, 20)),
                 plausible_upper_bounds=np.array((5, 50, 20)))
 
     optimize_result = bads.optimize()
@@ -304,19 +306,19 @@ with suppress_stdout():
 np.save(folder_net + f'/fitted_params_run{sys.argv[1]}_goals{sys.argv[2]}.npy', res)
 
 if do_plot:
-    plot_folder = folder_net + "plots/"
+    plot_folder = folder_net + "/plots"
     if not os.path.exists(plot_folder):
         os.mkdir(plot_folder)
 
     c = 5
     mov_error = moving_average(error, c)
-    x = np.arange(c, len(error))
+    x = np.arange(c, len(error) + 1)
     fig, ax = plt.subplots()
     ax.plot(error, color='k')
     ax.plot(x, mov_error, color='r')
     ax.set_xlabel('Number of trials')
     ax.set_ylabel('Error')
-    plt.savefig(plot_folder + f'plot_run{sys.argv[1]}_goals{sys.argv[2]}.pdf')
+    plt.savefig(plot_folder + f'/plot_run{sys.argv[1]}_goals{sys.argv[2]}.pdf')
     plt.close(fig)
 
 
@@ -330,7 +332,7 @@ if do_plot:
 # np.save(folder_net + '/fin_pos_trials.npy', fin_pos_trials)
 # np.save(folder_net + '/init_pos_trials.npy', init_pos_trials)
 # np.save(folder_net + '/init_angles_trials.npy', init_angles)
-#
-# # # Save network connectivity
-# for proj in projections():
-#     proj.save_connectivity(filename=folder_net + '/weights_' + proj.name + '.npz')
+
+# Save network connectivity
+for proj in projections():
+    proj.save_connectivity(filename=folder_net + '/weights_' + proj.name + '.npz')
