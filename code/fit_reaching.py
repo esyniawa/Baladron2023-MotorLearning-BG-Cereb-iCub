@@ -19,6 +19,11 @@ import os.path
 import sys
 import time
 import numpy as np
+
+# init fix seed
+simID = int(sys.argv[1])
+np.random.seed(simID)
+
 from pathlib import Path
 import matplotlib.pyplot as plt
 
@@ -66,9 +71,7 @@ num_trials_test = 50 # Number of test trials with the reservoir
 do_plot = True
 
 # Prepare save directory
-folder_net = 'results/f_network_g' + str(num_goals) + '_run'
-if len(sys.argv) > 1:
-    folder_net += '_' + sys.argv[1]
+folder_net = 'results/f_network_g' + str(num_goals) + '_run_' + str(simID)
 Path(folder_net).mkdir(parents=True, exist_ok=True)
 
 # Compile the network
@@ -323,11 +326,11 @@ if do_plot:
 
 
 # ## Save network data
-# np.save(folder_net + '/error_' + str(num_goals) + '.npy', error_history)
+np.save(folder_net + '/error_' + str(num_goals) + '.npy', error_history)
 #
 # # Save data
-# np.save(folder_net + '/parameter_' + str(num_goals) + '.npy' ,parameter)
-# np.save(folder_net + '/goals.npy', goal_history)
+np.save(folder_net + '/parameter_' + str(num_goals) + '.npy', parameter_history)
+np.save(folder_net + '/goals.npy', goal_history)
 # np.save(folder_net + '/goal_per_trial.npy', goal_per_trial)
 # np.save(folder_net + '/fin_pos_trials.npy', fin_pos_trials)
 # np.save(folder_net + '/init_pos_trials.npy', init_pos_trials)
