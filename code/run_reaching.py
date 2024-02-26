@@ -207,7 +207,7 @@ for t in range(num_trials):
     can = np.copy(angles)
     parameter.append(current_params)
     final_pos = execute_movement(current_params,can)
-    distance = np.linalg.norm(final_pos-current_goal)
+    distance = np.linalg.norm(final_pos-current_goal) * 100  # calculate error in [cm]
 
     fin_pos_trials.append(final_pos)
     init_pos_trials.append(initial_position)
