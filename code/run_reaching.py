@@ -57,8 +57,8 @@ if not os.path.exists(compile_folder):
 compile(directory=compile_folder + folder_net)
 
 # Save initial Res weights
-ConMonitor = monitoring.Con_Monitor([Wi])
-ConMonitor.save_cons(output_folder + folder_net + "initial_w")
+ConMonitor = monitoring.Con_Monitor([Wi, Wrec])
+ConMonitor.extract_weights()
 
 # Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
@@ -249,4 +249,5 @@ np.save(output_folder + folder_net + '/fin_pos_trials.npy', fin_pos_trials)
 np.save(output_folder + folder_net + '/init_pos_trials.npy', init_pos_trials)
 np.save(output_folder + folder_net + '/init_angles_trials.npy', init_angles)
 
-ConMonitor.save_cons(output_folder + folder_net + 'learned_w')
+ConMonitor.extract_weights()
+ConMonitor.save_cons(output_folder + folder_net + '/learned_w')

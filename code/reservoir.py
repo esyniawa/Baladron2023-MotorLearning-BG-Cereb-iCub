@@ -20,8 +20,8 @@ RC_neuron = Neuron(
         tau = 30.0 : population # Time constant
         constant = 0.0 # The four first neurons have constant rates
         alpha = 0.05 : population # To compute the sliding mean 0.05
-        f = 27.883
-        A = 133.476
+        f = 5.
+        A = 10.
     """,
     equations="""
         # Perturbation
@@ -45,7 +45,7 @@ RC_neuron = Neuron(
 #eta * trace * (mean_error) * (error - mean_error)
 TraceMiconi = Synapse(
     parameters="""
-        eta = 9.53
+        eta = 0.1
         learning_phase = 0.0 : projection # Flag to allow learning only at the end of a trial
         error = 0.0 : projection # Reward received
         mean_error = 0.0 : projection # Mean Reward received
