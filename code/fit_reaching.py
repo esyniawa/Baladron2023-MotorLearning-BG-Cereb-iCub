@@ -57,10 +57,28 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+
 def moving_average(a, n):
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1 :] / n
+
+
+# For resetting weights
+class Initial_weights(object):
+    def __init__(self, connections):
+        self.connections = connections
+
+    def write_weights(self, folder):
+        for con in self.connections:
+            if not os.path.exists(folder):
+                os.makedirs(folder + 'projections/')
+
+            con.save(folder + 'projections/' + con.name + '.npz')
+
+    def load_weights(self, folder):
+        for con in self.connections:
+            con.load(folder + 'projections/' + con.name + '.npz')
 
 
 # Parameters
@@ -79,7 +97,11 @@ compile_folder = "annarchy/"
 if not os.path.exists(compile_folder):
     os.mkdir(compile_folder)
 
-compile(directory=compile_folder + f"run_{sys.argv[1]}")
+compile(directory=compile_folder + f"run_{sys.argv[1]}/")
+
+# Save init reservoir weights
+W_reservoir = Initial_weights([Wrec])
+W_reservoir.write_weights(compile_folder + f"run_{sys.argv[1]}/")
 
 # Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
@@ -202,6 +224,9 @@ def fit_reservoir(initial_eta=0.8,
                       weight_mean=1.0,
                       weight_sd=2.0,
                       accumulate_trials=num_accumulate):
+
+        # reset weights
+        W_reservoir.load_weights(compile_folder + f"run_{sys.argv[1]}/")
 
         param_eta, param_A, param_f = res_params
 
